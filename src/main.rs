@@ -99,12 +99,12 @@ fn main() {
                     j += 1;
                 }
             }
-            // not in vinella brainf*ck
+            // not in vanilla brainf*ck
             '*' => 
                 // the * char returns the ptr in the slot the ptr is
                 array[ptr] = ptr as u8,
-            '#' => // allow only the number of chars in the current slot to be inputed by ,
-                // NOTE : the deault value is 255 chars
+            '#' => // allow only the number of chars in the current slot to be inputted by ,
+                // NOTE : the default value is 255 chars
                 max_input_len = array[ptr] as usize,
             '@' => // @ jumps the pointer to the address in the current slot and the next combined
                 // NOTE : current is the heigh byte and next is the low one
