@@ -49,8 +49,6 @@ fn main() {
 
         let mut letter = letter_wrapped.unwrap();
 
-        print!("{}", letter);
-
         match letter {
             '>' => ptr += 1,
             '<' => {
