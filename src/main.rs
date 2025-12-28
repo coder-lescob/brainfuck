@@ -4,11 +4,11 @@ use std::env;
 
 fn main() {
     // get the name of the program
-    let args: Vec<String> = env::args()
+    let mut args: Vec<String> = env::args()
         .collect();
     if args.len() < 2 {
-        println!("no input file given");
-        return;
+        println!("no input file given, defaulted to test.bf.");
+        args.push(String::from("test.bf"));
     }
     let program_name      = &args[1];
 
@@ -53,7 +53,14 @@ fn main() {
 
         match letter {
             '>' => ptr += 1,
-            '<' => ptr -= 1,
+            '<' => {
+                if ptr > 0 {
+                    ptr -= 1;
+                }
+                else {
+                    ptr = array.len() - 1;
+                }
+            },
             // allow operations overflow
             '+' => array[ptr] = array[ptr].wrapping_add(1)  ,
             '-' => array[ptr] = array[ptr].wrapping_sub(1),
@@ -66,7 +73,7 @@ fn main() {
                         while
                         i < contents.len()
                             &&
-                            whiles != 0 {
+                            whiles > 0 {
                             i += 1;
                             letter = contents
                                 .chars()
