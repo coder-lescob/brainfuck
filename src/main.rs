@@ -16,10 +16,12 @@ fn main() {
     let contents = fs::read_to_string(program_name)
         .expect("unable to read input file.");
 
+    let array_size = 100000;
+
     // create the array
-    let mut array: Vec<u8> = Vec::with_capacity(10000);
+    let mut array: Vec<u8> = Vec::with_capacity(array_size);
     unsafe  {
-        array.set_len(10000);
+        array.set_len(array_size);
     }
     
     for i in 0..array.len() {
@@ -36,49 +38,58 @@ fn main() {
     // loop over each character
     while i < contents.len() {
         // get the letter
-        let letter_wraped: Option<char> = contents
+        let letter_wrapped: Option<char> = contents
             .chars()
             .nth(i);
 
-        if letter_wraped == None {
+        if letter_wrapped == None {
             i += 1;
             continue;
         }
 
-        let mut letter = letter_wraped.unwrap();
+        let mut letter = letter_wrapped.unwrap();
+
+        print!("{}", letter);
 
         match letter {
-            '>' => ptr        += 1,
-            '<' => ptr        -= 1,
+            '>' => ptr += 1,
+            '<' => ptr -= 1,
             // allow operations overflow
-            '+' => array[ptr] += 1,
-            '-' => array[ptr] -= 1,
-            '[' => 
-            {
-                while_stack.insert(0, i);
+            '+' => array[ptr] = array[ptr].wrapping_add(1)  ,
+            '-' => array[ptr] = array[ptr].wrapping_sub(1),
+            '[' =>
+                {
+                    while_stack.push(i);
 
-                if array[ptr] == 0 {
-                    while 
-                        i < contents.len() 
-                            && 
-                        letter != ']' {
-                                i += 1;
+                    if array[ptr] == 0 {
+                        let mut whiles: usize = 1;
+                        while
+                        i < contents.len()
+                            &&
+                            whiles != 0 {
+                            i += 1;
                             letter = contents
                                 .chars()
                                 .nth(i)
                                 .unwrap();
+
+                            if letter == '[' {
+                                whiles += 1;
+                            } else if letter == ']' {
+                                whiles -= 1;
+                            }
                         }
+                    }
                 }
-            }
-            ']' => 
-            {
-                if while_stack.len() == 0 {
-                    println!("no matching closing loop at char number {i}");
-                    return;
+            ']' =>
+                {
+                    if while_stack.len() == 0 {
+                        println!("no matching opening loop at char number {i}");
+                        return;
+                    }
+                    i = while_stack.pop().unwrap();
+                    continue;
                 }
-                i = while_stack.pop().unwrap();
-                continue;
-            }
             '.' => print!("{}", array[ptr] as char),
             ',' => {
                 // not implemented as the original who just get a char
@@ -88,26 +99,26 @@ fn main() {
                 let mut j: usize = 0;
 
                 while j < buffer.len() && j < max_input_len {
-                    let letter_wraped: Option<char> = buffer.chars().nth(j);
-                    if letter_wraped == None {
-                        j += 1; 
+                    let letter_wrapped: Option<char> = buffer.chars().nth(j);
+                    if letter_wrapped == None {
+                        j += 1;
                         continue;
                     }
 
-                    let letter = letter_wraped.unwrap();
+                    let letter = letter_wrapped.unwrap();
                     array[ptr + j] = letter as u8;
                     j += 1;
                 }
             }
-            // not in vanilla brainf*ck
-            '*' => 
-                // the * char returns the ptr in the slot the ptr is
+            // not in vanilla Brainfuck
+            '*' =>
+            // the * char returns the ptr in the slot the ptr is
                 array[ptr] = ptr as u8,
             '#' => // allow only the number of chars in the current slot to be inputted by ,
-                // NOTE : the default value is 255 chars
+            // NOTE : the default value is 255 chars
                 max_input_len = array[ptr] as usize,
             '@' => // @ jumps the pointer to the address in the current slot and the next combined
-                // NOTE : current is the heigh byte and next is the low one
+            // NOTE : current is the heigh byte and next is the low one
                 ptr = (array[ptr] as usize) << 8 | array[ptr + 1] as usize,
             _ => {/* do nothing ! */}
         }
